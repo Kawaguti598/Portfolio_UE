@@ -34,8 +34,6 @@ Unreal Engine 学習用に制作している簡易 TPS ゲームです。
 ## 動作環境
 - Windows 10 / 11  
 - Unreal Engine 5.5 推奨  
-- CPU: Intel Core i5 / Ryzen 5 相当以上  
-- GPU: GTX 1060 / RX 580 以上  
 
 ---
 
