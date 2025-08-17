@@ -28,9 +28,6 @@ Unreal Engine 学習用に制作している簡易 TPS ゲームです。
 ---
 
 ## 起動方法
-1. Unreal Engine 5.5 で `.uproject` を開く  
-2. 初回起動時は `Binaries/`, `DerivedDataCache/`, `Intermediate/`, `Saved/` フォルダを削除して再生成推奨  
-3. エディタから Play 実行  
 
 ---
 
