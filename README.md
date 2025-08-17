@@ -47,7 +47,6 @@ Unreal Engine 学習用に制作している簡易 TPS ゲームです。
 ---
 
 ## ライセンス・使用素材
-- このリポジトリは個人制作のポートフォリオ用です  
 - 使用しているアセット・素材:
   - BGM/SE: **魔王魂**, **Springin' Sound Stock**  
   - 一部アセット: Unreal Engine 標準アセット, Fab(Epic Games)
