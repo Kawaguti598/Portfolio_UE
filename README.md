@@ -28,6 +28,10 @@ Unreal Engine 学習用に制作している簡易 TPS ゲームです。
 ---
 
 ## 起動方法
+1. 本リポジトリを Clone または Download ZIP してください
+2. Unreal Engine 5.5.4 以降をインストールしてください
+3. `TPSTrial.uproject` をダブルクリックするとエディタで開けます
+4. Unreal Editor 内から「▶」ボタンでゲームを実行できます
 
 ---
 
