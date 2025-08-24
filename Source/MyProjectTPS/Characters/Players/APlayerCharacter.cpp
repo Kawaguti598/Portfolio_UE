@@ -8,13 +8,14 @@
 
 APlayerCharacter::APlayerCharacter()
 {
-    PrimaryActorTick.bCanEverTick = false;
+    PrimaryActorTick.bCanEverTick = true;
 
     // 初期値設定
     bIsDodging = false;
     bIsInvincible = false;
     bCanDodge = true;
     DodgeDirection = FVector::ZeroVector;
+    DodgeElapsedTime = 0.0f;
 }
 
 void APlayerCharacter::BeginPlay()
@@ -28,6 +29,29 @@ bool APlayerCharacter::CanPerformDodge() const
     return bCanDodge && !bIsDodging && GetCharacterMovement()->IsMovingOnGround();
 }
 
+void APlayerCharacter::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+    // 回避中の移動処理
+    if (bIsDodging)
+    {
+        DodgeElapsedTime += DeltaTime;
+        const float Alpha = FMath::Clamp(DodgeElapsedTime / DodgeDuration, 0.0f, 1.0f);
+
+        // スムーズな補間移動（Ease InOut カーブ）
+        const float EasedAlpha = FMath::InterpEaseInOut(0.0f, 1.0f, Alpha, 2.0f);
+        const FVector CurrentTarget = FMath::Lerp(DodgeStartLocation, DodgeTargetLocation, EasedAlpha);
+
+        // Sweep=true で安全な移動
+        SetActorLocation(CurrentTarget, true);
+
+        // デバッグログ
+        UE_LOG(LogTemp, VeryVerbose, TEXT("Dodge Progress: %f%% - Position: %s"),
+            Alpha * 100.0f, *GetActorLocation().ToString());
+    }
+}
+
 void APlayerCharacter::StartDodgeSequence(FVector Direction)
 {
     if (!CanPerformDodge())
@@ -36,10 +60,15 @@ void APlayerCharacter::StartDodgeSequence(FVector Direction)
         return;
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("=== TIMELINE DODGE SYSTEM START ==="));
+    UE_LOG(LogTemp, Warning, TEXT("=== C++ DODGE SYSTEM START ==="));
 
     // 回避方向設定
     DodgeDirection = Direction.GetSafeNormal();
+
+    // 移動位置計算
+    DodgeStartLocation = GetActorLocation();
+    DodgeTargetLocation = DodgeStartLocation + (DodgeDirection * DodgeDistance);
+    DodgeElapsedTime = 0.0f;
 
     // 状態設定
     bIsDodging = true;
@@ -54,7 +83,7 @@ void APlayerCharacter::StartDodgeSequence(FVector Direction)
         UE_LOG(LogTemp, Log, TEXT("Character rotated to dodge direction: %s"), *DodgeRotation.ToString());
     }
 
-    // Blueprint側の移動処理を呼び出し
+    // Blueprint 呼び出しを削除（コメントアウト）
     BP_ExecuteDodgeMovement(DodgeDirection, DodgeDistance, DodgeDuration);
 
     // アニメーション再生
@@ -68,8 +97,8 @@ void APlayerCharacter::StartDodgeSequence(FVector Direction)
     GetWorldTimerManager().SetTimer(InvincibilityStartTimer, this, &APlayerCharacter::StartInvincibility, InvincibilityStartTime, false);
     GetWorldTimerManager().SetTimer(DodgeEndTimer, this, &APlayerCharacter::EndDodge, DodgeDuration, false);
 
-    UE_LOG(LogTemp, Warning, TEXT("Dodge sequence initiated - Direction: %s, Distance: %f, Duration: %f"),
-        *DodgeDirection.ToString(), DodgeDistance, DodgeDuration);
+    UE_LOG(LogTemp, Warning, TEXT("C++ Dodge initiated - Start: %s, Target: %s, Duration: %f"),
+        *DodgeStartLocation.ToString(), *DodgeTargetLocation.ToString(), DodgeDuration);
 }
 
 void APlayerCharacter::PerformDodgeInCurrentDirection()
@@ -98,11 +127,15 @@ void APlayerCharacter::EndInvincibility()
 void APlayerCharacter::EndDodge()
 {
     bIsDodging = false;
+    DodgeElapsedTime = 0.0f;
+
+    // 最終位置を確実に設定
+    SetActorLocation(DodgeTargetLocation, true);
 
     // クールダウン開始
     GetWorldTimerManager().SetTimer(CooldownResetTimer, this, &APlayerCharacter::ResetDodgeCooldown, DodgeCooldown, false);
 
-    UE_LOG(LogTemp, Log, TEXT("Dodge ended - Cooldown started (%f seconds)"), DodgeCooldown);
+    UE_LOG(LogTemp, Log, TEXT("C++ Dodge ended - Final position: %s"), *GetActorLocation().ToString());
 }
 
 void APlayerCharacter::ResetDodgeCooldown()

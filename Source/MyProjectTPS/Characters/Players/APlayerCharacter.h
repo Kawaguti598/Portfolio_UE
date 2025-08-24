@@ -54,6 +54,16 @@ protected:
     UPROPERTY(BlueprintReadOnly, Category = "Dodge System")
     FVector DodgeDirection;
 
+    // 回避移動用の変数
+    UPROPERTY(BlueprintReadOnly, Category = "Dodge System")
+    FVector DodgeStartLocation;
+
+    UPROPERTY(BlueprintReadOnly, Category = "Dodge System")
+    FVector DodgeTargetLocation;
+
+    UPROPERTY(BlueprintReadOnly, Category = "Dodge System")
+    float DodgeElapsedTime = 0.0f;
+
     // タイマーハンドル
     FTimerHandle InvincibilityStartTimer;
     FTimerHandle InvincibilityEndTimer;
@@ -127,4 +137,7 @@ public:
     // 射撃レート向上率計算（UI表示用）
     UFUNCTION(BlueprintCallable, Category = "Fire System")
     float CalculateFireRateImprovement(float BaseInterval, float CurrentInterval) const;
+
+    // Tick を有効化するためにオーバーライド
+    virtual void Tick(float DeltaTime) override;
 };
